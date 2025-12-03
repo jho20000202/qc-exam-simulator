@@ -1,0 +1,152 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>品管考試模擬器</title>
+    <meta name="description" content="品質管理考試模擬練習系統，提供即時答題回饋">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Mode Selection Screen -->
+    <div class="mode-selection" id="mode-selection">
+        <div class="mode-card">
+            <h1 class="mode-title">品管考試系統</h1>
+            <div class="mode-buttons">
+                <button class="mode-btn simulation" id="simulation-btn">
+                    <div class="mode-icon"></div>
+                    <h2>模擬測驗</h2>
+                    <ul class="mode-details">
+                        <li>限時 90 分鐘</li>
+                        <li>隨機 100 題</li>
+                        <li>60 分及格</li>
+                    </ul>
+                </button>
+                <button class="mode-btn practice" id="practice-btn">
+                    <div class="mode-icon"></div>
+                    <h2>一般測試</h2>
+                    <ul class="mode-details">
+                        <li>不限時間</li>
+                        <li>隨機題目</li>
+                        <li>即時回饋</li>
+                    </ul>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Container -->
+    <div class="container" id="quiz-container" style="display: none;">
+        <header class="header">
+            <div class="header-left">
+                <h1 class="title">品管考試模擬器</h1>
+            </div>
+            <div class="header-info">
+                <button class="home-btn" id="home-btn" title="返回首頁">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                </button>
+                <div class="timer" id="timer" style="display: none;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                    <span id="timer-display">90:00</span>
+                </div>
+                <div class="progress-info">
+                    <span id="current-question">1</span> / <span id="total-questions">0</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="quiz-container">
+            <div class="question-card">
+                <div class="question-header">
+                    <span class="question-number" id="question-number">題號 1</span>
+                    <span class="question-unit" id="question-unit">單元</span>
+                </div>
+                <div class="question-text" id="question-text">
+                    載入中...
+                </div>
+                <div class="options-container" id="options-container">
+                    <!-- Options will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="nav-btn" id="prev-btn" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 18l-6-6 6-6"/>
+                    </svg>
+                    上一題
+                </button>
+                <button class="nav-btn primary" id="next-btn">
+                    下一題
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                </button>
+                <button class="nav-btn submit" id="submit-btn" style="display: none;">
+                    提交測驗
+                </button>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label">已答題</span>
+                    <span class="stat-value" id="answered-count">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">正確</span>
+                    <span class="stat-value correct" id="correct-count">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">錯誤</span>
+                    <span class="stat-value incorrect" id="incorrect-count">0</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Result Screen -->
+    <div class="result-screen" id="result-screen" style="display: none;">
+        <div class="result-card">
+            <h1 class="result-title">測驗結果</h1>
+            <div class="result-score">
+                <div class="score-circle" id="score-circle">
+                    <span class="score-value" id="score-value">0</span>
+                    <span class="score-total">/ 100</span>
+                </div>
+                <div class="score-percentage" id="score-percentage">0%</div>
+            </div>
+            <div class="result-status" id="result-status">
+                <!-- Pass/Fail status will be inserted here -->
+            </div>
+            <div class="result-details">
+                <div class="detail-item">
+                    <span class="detail-label">正確</span>
+                    <span class="detail-value correct" id="result-correct">0</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">錯誤</span>
+                    <span class="detail-value incorrect" id="result-incorrect">0</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">用時</span>
+                    <span class="detail-value" id="result-time">0:00</span>
+                </div>
+            </div>
+            <button class="restart-btn" id="restart-btn">返回首頁</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
