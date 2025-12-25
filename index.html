@@ -17,7 +17,7 @@
             <h1 class="mode-title">品管考試系統</h1>
             <div class="mode-buttons">
                 <button class="mode-btn simulation" id="simulation-btn">
-                    <div class="mode-icon"></div>
+                    <div class="mode-icon">⏱️</div>
                     <h2>模擬測驗</h2>
                     <ul class="mode-details">
                         <li>限時 90 分鐘</li>
@@ -26,7 +26,7 @@
                     </ul>
                 </button>
                 <button class="mode-btn practice" id="practice-btn">
-                    <div class="mode-icon"></div>
+                    <div class="mode-icon">✏️</div>
                     <h2>一般測試</h2>
                     <ul class="mode-details">
                         <li>不限時間</li>
@@ -34,7 +34,44 @@
                         <li>即時回饋</li>
                     </ul>
                 </button>
+                <button class="mode-btn browse" id="browse-btn">
+                    <div class="mode-icon">📖</div>
+                    <h2>瀏覽題庫</h2>
+                    <ul class="mode-details">
+                        <li>瀏覽所有題目</li>
+                        <li>顯示正確答案</li>
+                        <li>自動載入 (100題/次)</li>
+                    </ul>
+                </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Browse Container -->
+    <div class="container" id="browse-container" style="display: none;">
+        <header class="header">
+            <div class="header-left">
+                <h1 class="title">題庫瀏覽</h1>
+            </div>
+            <div class="header-info">
+                <button class="home-btn" id="browse-home-btn" title="返回首頁">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                        <polyline points="9 22 9 12 15 12 15 22"/>
+                    </svg>
+                </button>
+                <div class="progress-info">
+                    <span id="browse-count">0</span> / <span id="browse-total">0</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="quiz-container" id="browse-list">
+            <!-- Questions will be dynamically inserted here -->
+        </main>
+        
+        <div class="loading-indicator" id="browse-loading" style="display: none;">
+            載入更多題目中...
         </div>
     </div>
 

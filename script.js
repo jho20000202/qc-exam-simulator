@@ -14,8 +14,16 @@ const quizContainer = document.getElementById('quiz-container');
 const resultScreen = document.getElementById('result-screen');
 const simulationBtn = document.getElementById('simulation-btn');
 const practiceBtn = document.getElementById('practice-btn');
+const browseBtn = document.getElementById('browse-btn');
 const restartBtn = document.getElementById('restart-btn');
 const homeBtn = document.getElementById('home-btn');
+
+const browseContainer = document.getElementById('browse-container');
+const browseHomeBtn = document.getElementById('browse-home-btn');
+const browseList = document.getElementById('browse-list');
+const browseLoading = document.getElementById('browse-loading');
+const browseCountSpan = document.getElementById('browse-count');
+const browseTotalSpan = document.getElementById('browse-total');
 
 const questionNumber = document.getElementById('question-number');
 const questionUnit = document.getElementById('question-unit');
@@ -32,6 +40,11 @@ const incorrectCountSpan = document.getElementById('incorrect-count');
 
 const timerElement = document.getElementById('timer');
 const timerDisplay = document.getElementById('timer-display');
+
+// ===== Browse Mode State =====
+let browseOffset = 0;
+let isBrowsing = false;
+const BROWSE_BATCH_SIZE = 100;
 
 // ===== Utility Functions =====
 function shuffleArray(array) {
@@ -69,7 +82,9 @@ async function init() {
         // Set up mode selection
         simulationBtn.addEventListener('click', () => startTest('simulation'));
         practiceBtn.addEventListener('click', () => startTest('practice'));
+        browseBtn.addEventListener('click', startBrowse);
         restartBtn.addEventListener('click', resetToModeSelection);
+
         if (homeBtn) {
             homeBtn.addEventListener('click', () => {
                 if (confirm('確定要返回首頁嗎？目前進度將會遺失。')) {
@@ -77,6 +92,19 @@ async function init() {
                 }
             });
         }
+
+        if (browseHomeBtn) {
+            browseHomeBtn.addEventListener('click', resetToModeSelection);
+        }
+
+        // Infinite Scroll for Browse Mode
+        window.addEventListener('scroll', () => {
+            if (!isBrowsing) return;
+
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 500) {
+                loadMoreQuestions();
+            }
+        });
 
     } catch (error) {
         console.error('載入題目失敗:', error);
@@ -110,9 +138,106 @@ function startTest(mode) {
     // Hide mode selection, show quiz
     modeSelection.style.display = 'none';
     quizContainer.style.display = 'block';
+    browseContainer.style.display = 'none';
 
     renderQuestion();
     updateNavButtons();
+}
+
+// ===== Start Browse =====
+function startBrowse() {
+    isBrowsing = true;
+    testMode = 'browse';
+    browseOffset = 0;
+
+    // Hide others, show browse
+    modeSelection.style.display = 'none';
+    quizContainer.style.display = 'none';
+    resultScreen.style.display = 'none';
+    browseContainer.style.display = 'block';
+
+    // Reset list
+    browseList.innerHTML = '';
+    browseTotalSpan.textContent = allQuestions.length;
+
+    // Load first batch
+    loadMoreQuestions();
+}
+
+// ===== Load More Questions =====
+function loadMoreQuestions() {
+    // If already all loaded, stop
+    if (browseOffset >= allQuestions.length) {
+        browseLoading.style.display = 'none';
+        return;
+    }
+
+    browseLoading.style.display = 'block';
+
+    const batch = allQuestions.slice(browseOffset, browseOffset + BROWSE_BATCH_SIZE);
+
+    // Render batch
+    batch.forEach(question => {
+        const card = document.createElement('div');
+        card.className = 'browse-question-card';
+
+        const header = document.createElement('div');
+        header.className = 'browse-question-header';
+
+        const badge = document.createElement('span');
+        badge.className = 'browse-question-badge';
+        badge.textContent = `題號 ${question.id}`;
+
+        const unit = document.createElement('span');
+        unit.style.color = 'var(--color-text-secondary)';
+        unit.style.fontSize = '0.9rem';
+        unit.textContent = question.unit || '未分類';
+
+        header.appendChild(badge);
+        header.appendChild(unit);
+
+        const text = document.createElement('div');
+        text.className = 'browse-question-text';
+        text.textContent = question.question;
+
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'browse-options';
+
+        ['A', 'B', 'C', 'D'].forEach(key => {
+            if (question.options[key]) {
+                const option = document.createElement('div');
+                option.className = 'browse-option';
+
+                if (key === question.answer) {
+                    option.classList.add('correct');
+                }
+
+                const label = document.createElement('span');
+                label.className = 'browse-option-label';
+                label.textContent = key;
+
+                const val = document.createElement('span');
+                val.textContent = question.options[key];
+
+                option.appendChild(label);
+                option.appendChild(val);
+                optionsDiv.appendChild(option);
+            }
+        });
+
+        card.appendChild(header);
+        card.appendChild(text);
+        card.appendChild(optionsDiv);
+
+        browseList.appendChild(card);
+    });
+
+    browseOffset += batch.length;
+    browseCountSpan.textContent = Math.min(browseOffset, allQuestions.length);
+
+    if (browseOffset >= allQuestions.length) {
+        browseLoading.style.display = 'none';
+    }
 }
 
 // ===== Timer Functions =====
@@ -385,6 +510,7 @@ function resetToModeSelection() {
     }
 
     testMode = null;
+    isBrowsing = false;
     questions = [];
     currentQuestionIndex = 0;
     userAnswers = {};
@@ -392,6 +518,7 @@ function resetToModeSelection() {
 
     resultScreen.style.display = 'none';
     quizContainer.style.display = 'none';
+    if (browseContainer) browseContainer.style.display = 'none';
     modeSelection.style.display = 'flex';
 }
 
